@@ -1,0 +1,35 @@
+[
+    {
+        "id": 1,
+        "title": "Levis 511",
+        "description": "working pants",
+        "price": "50",
+        "thumbnail": "",
+        "code": "3",
+        "stock": "56",
+        "category": "clothing",
+        "status": "ok"
+    },
+    {
+        "id": 2,
+        "title": "Santa Cruz T-Shirt",
+        "description": "t-shirt",
+        "price": "200",
+        "thumbnail": "",
+        "code": "20",
+        "stock": "5",
+        "category": "clothing",
+        "status": "ok"
+    },
+    {
+        "id": 3,
+        "title": "IPhone 14 Pro",
+        "description": "telephone",
+        "price": "1500",
+        "thumbnail": "",
+        "code": "355",
+        "stock": "3",
+        "category": "Technology",
+        "status": "ok"
+    }   
+]
