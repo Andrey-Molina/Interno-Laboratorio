@@ -2,16 +2,15 @@ import {Router} from "express"
 import ProductManager from "../dao/ProductManager.js"
 import { upload } from "../../utils.js"
 import { io } from "../app.js"
-
-
-const Producto = new ProductManager()
-
 const router = Router()
+
+const producto = new ProductManager()
+
 
 router.get("/", async (req, res) => {
 
     try {
-        let resultado = await Producto.getProducts()
+        let resultado = await producto.getProducts()
 
         //              QUERY PARAMS
         let limit = parseInt(req.query.limit)
@@ -26,7 +25,7 @@ router.get("/", async (req, res) => {
 
     } catch (error) {
         res.setHeader("Content-Type", "application/json")
-        res.status(500).res.json({ Error: "Error 500 - Error inesperado en el servidor" })
+        res.status(500).res.json({ Error: "Error 500 - Error inesperado en el servidor (productsRoute" })
     }
 })
 
@@ -34,7 +33,7 @@ router.get("/", async (req, res) => {
 router.get("/:pid", async (req, res) => {
 
     try {
-        await Producto.getProducts()
+        await producto.getProducts()
 
         //          P A R A M S
         let id = parseInt(req.params.pid)
@@ -54,7 +53,7 @@ router.get("/:pid", async (req, res) => {
 router.post("/", upload.single("thumbnail"), async (req, res) => {
     
     try {
-        await Producto.getProducts() //Llamo a getProducts() para poder validar el código del producto
+        await producto.getProducts() //Llamo a getProducts() para poder validar el código del producto
 
         let thumbnail = req.file.filename
 
@@ -68,7 +67,7 @@ router.post("/", upload.single("thumbnail"), async (req, res) => {
             })
         } 
 
-        let codigoRepetido = Producto.products.some(elem => elem.code === code)
+        let codigoRepetido = producto.products.some(elem => elem.code === code)
         if (codigoRepetido) {
             res.setHeader("Content-Type", "application/json")
             return res.status(400).json({
@@ -76,7 +75,7 @@ router.post("/", upload.single("thumbnail"), async (req, res) => {
             })
         }
 
-        let nuevoProducto = await Producto.addProduct({ title, description, price, thumbnail, code, stock, category, status })
+        let nuevoProducto = await producto.addProduct({ title, description, price, thumbnail, code, stock, category, status })
         
         io.emit("listadoActualizado", nuevoProducto)//Emit para la vista handlebars/realtimeproducts
 
@@ -95,7 +94,7 @@ router.put("/:pid", async (req, res) => {
 
     try {
         
-        await Producto.getProducts()
+        await producto.getProducts()
 
         let id = parseInt(req.params.pid) //El id viene por params
         let { title, description, price, thumbnail, code, stock, category, status } = req.body //En el body viene el objeto
@@ -108,7 +107,7 @@ router.put("/:pid", async (req, res) => {
             })
         }
 
-        let codigoRepetido = Producto.products.some(elem => elem.code === code)
+        let codigoRepetido = producto.products.some(elem => elem.code === code)
         if (codigoRepetido) {
             res.setHeader("Content-Type", "application/json")
             return res.status(400).json({
@@ -116,7 +115,7 @@ router.put("/:pid", async (req, res) => {
             })
         }
 
-        let nuevoProducto = await Producto.updateProduct(id, {title, description, price, thumbnail, code, stock, category, status})
+        let nuevoProducto = await producto.updateProduct(id, {title, description, price, thumbnail, code, stock, category, status})
         res.setHeader("Content-Type", "application/json")
         return res.status(200).json(nuevoProducto)
 
@@ -129,9 +128,9 @@ router.put("/:pid", async (req, res) => {
 
 router.delete("/:pid", async (req, res) => {
     try {
-        await Producto.getProducts()
+        await producto.getProducts()
         let id = parseInt(req.params.pid)
-        let producto = await Producto.deleteProduct(id)
+        let producto = await producto.deleteProduct(id)
         res.setHeader("Content-Type", "application/json")
         res.status(200).json(producto)
     } catch (error) {

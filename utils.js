@@ -1,6 +1,8 @@
 import {fileURLToPath} from "url"
 import {dirname, join} from "path"
 import multer from "multer"
+import crypto from "crypto"
+import bcrypt from "bcrypt"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -19,9 +21,9 @@ const storage = multer.diskStorage({
     
       cb(null, Date.now() + '-' + file.originalname)
     }
-  })
-  
-  const upload = multer({ storage: storage })
+  })  
+const upload = multer({ storage: storage })
 
-
-  export {__dirname, upload};
+export const generaHash=password=>bcrypt.hashSync(password, bcrypt.genSaltSync(10))
+export const validaPasword=(password, passwordHash)=>bcrypt.compareSync(password, passwordHash)
+export {__dirname, upload};

@@ -6,28 +6,54 @@ import {router as cartsRouter} from "./routes/cartsRoutes.js"
 import {router as viewsRouter} from "./routes/viewsRouter.js"
 import {errorHandler} from "./middlewares/errorHandler.js"
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
 import {__dirname} from "../utils.js"
 import path from "path"
+import passport from "passport" 
+import local from "passport-local"
+import { initPassport } from "./config/passport.config.js"
+import sessions from "express-session"
+import { router as sessionsRouter } from './routes/sessions.router.js';
+// import { router as vistasRouter } from './routes/viewsRouter.js';
+
 
 const PORT = 8080
 const app = express()
-
 let serverSocket
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
+
+dotenv.config();
 
 // handlebars
 app.engine("handlebars", engine())
 app.set("view engine", "handlebars")
 app.set("views", path.join(__dirname, "./src/views"))
 
-app.use(express.static(path.join(__dirname,'./src/public')));
+
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(sessions({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+}));
+
+initPassport()
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 // router
 app.use("/api/products", productsRouter)
 app.use("/api/carts", cartsRouter)
+app.use("/api/sessions", sessionsRouter)
 app.use("/", viewsRouter)
+
+
+// serve the views router first and then the static for default
+app.use(express.static(path.join(__dirname,'./src/public')));
+
 
 let usuarios=[]
 let mensajes=[]
@@ -69,26 +95,26 @@ io.on("connection", socket=>{
         }
     })
 })
-
 export {io}
 
-    const connDB= async()=>{
-        try {
-            await mongoose.connect(
-                "mongodb+srv://cluster0.vdkwxow.mongodb.net/ --apiVersion 1 --username andreymolina1",
-                {
-                    dbName:"dbTest"
-                }
-            )
-            console.log("db online")
-        }catch (e) {
-            console.log("error al conectar con db", e.message)
-        }
+
+dotenv.config();
+
+const connDB = async () => {
+    try {
+      await mongoose.connect(process.env.MONGO_URI, {});
+      console.log("Base de datos online");
+    } catch (e) {
+      console.log("Error connecting to DB:", e.message);
     }
-    
-    connDB();
+  };
+  
+  connDB();
     
 
 // atlas credentials
 // user: andreymolina1
 // pass: mYB93nefc43eSINq
+
+
+// Usamos la estrategia de passport local para autenticacion
